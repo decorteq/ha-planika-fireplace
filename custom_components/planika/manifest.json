@@ -1,0 +1,11 @@
+{
+  "domain": "planika",
+  "name": "Planika Fireplace",
+  "version": "1.0.0",
+  "documentation": "https://github.com/bkovacic/homebridge-planika",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [],
+  "iot_class": "local_polling",
+  "config_flow": true
+}
