@@ -1,6 +1,4 @@
 {
   "name": "Planika Fireplace",
-  "domains": ["light"],
-  "iot_class": "local_polling",
   "homeassistant": "2023.1.0"
 }
