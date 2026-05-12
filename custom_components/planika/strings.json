@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Planika Fireplace",
+        "description": "Enter the IP address of your Planika fireplace on the local network.",
+        "data": {
+          "host": "IP Address",
+          "port": "Port (default 3000)",
+          "name": "Fireplace name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the Planika fireplace. Check the IP address and ensure the device is reachable.",
+      "unknown": "An unexpected error occurred. Check the Home Assistant logs for details."
+    },
+    "abort": {
+      "already_configured": "This Planika fireplace is already configured."
+    }
+  }
+}
