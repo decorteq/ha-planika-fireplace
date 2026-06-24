@@ -5,8 +5,8 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/decorteq/ha-planika-fireplace",
-  "issue_tracker": "https://github.com/decorteq/ha-planika-fireplace/issues",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/decorteq/ha-planika-fireplace/issues",
   "requirements": [],
   "version": "1.0.0"
 }
