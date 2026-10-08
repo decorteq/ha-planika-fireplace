@@ -1,12 +1,14 @@
 {
   "domain": "planika",
   "name": "Planika Fireplace",
-  "version": "3.0.1",
+  "codeowners": [
+    "@decorteq"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/decorteq/ha-planika-fireplace",
-  "issue_tracker": "https://github.com/decorteq/ha-planika-fireplace/issues",
-  "codeowners": ["@decorteq"],
-  "iot_class": "local_polling",
   "integration_type": "device",
-  "requirements": []
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/decorteq/ha-planika-fireplace/issues",
+  "requirements": [],
+  "version": "3.0.1"
 }
