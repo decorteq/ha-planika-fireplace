@@ -37,6 +37,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: PlanikaConfigEntry) -> b
     return True
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: PlanikaConfigEntry) -> bool:
+    """Migrate a 1.x entry.
+
+    Version 1 assumed port 3000, which the hardware never used; the real
+    protocol is on port 2000. Keep the host and name, switch the port.
+    """
+    if entry.version == 1:
+        data = {**entry.data, CONF_PORT: DEFAULT_PORT}
+        hass.config_entries.async_update_entry(
+            entry,
+            data=data,
+            unique_id=f"{data[CONF_HOST]}:{DEFAULT_PORT}",
+            version=2,
+        )
+    return entry.version == 2
+
+
 async def async_unload_entry(hass: HomeAssistant, entry: PlanikaConfigEntry) -> bool:
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 

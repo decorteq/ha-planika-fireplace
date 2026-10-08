@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1
+
+* Existing 1.x config entries are migrated automatically (the port is corrected from 3000 to 2000), instead of failing to load.
+* Setup error text no longer tells you to close the Planika app; the app and Home Assistant can be connected at the same time.
+* CI workflows can be started manually.
+
 ## 3.0.0
 
 Complete rewrite based on the real protocol of the module (see docs/PROTOCOL.md).
