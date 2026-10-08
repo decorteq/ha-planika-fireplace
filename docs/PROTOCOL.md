@@ -117,7 +117,7 @@ STX (0x02)  "30303030"  <code>  ETX (0x03)
 * `30303030` is a constant prefix on all **commands** the app sends. Its meaning is unknown; it is always sent.
 * The device answers every message. Replies are also `STX ... ETX` framed and start with `0303000000` followed by the last two characters of the command code (for example `03030000001A` acknowledges `801A`, `030300000016` acknowledges `8016LL`, and `030300000003` marks a status reply to `8003`).
 * **Connection behaviour (observed):** shortly after one connection closes, a new connection often receives no answer for some time. Holding **one long-lived connection** and polling over it is reliable. The module also disappears from Wi-Fi for minutes at a time on the tested unit, so a client must reconnect with back-off.
-* **Multiple clients (not tested):** whether the official app and another client can be connected simultaneously is unknown. Close the app while Home Assistant is connected to be safe.
+* **Multiple clients (observed):** the official app and this integration can be connected at the same time. A change made in one is reflected in the other, because both read the device's own state.
 
 Example: poll status.
 
@@ -237,7 +237,6 @@ Notes:
 
 ## 9. Open questions
 
-* Whether the Planika app and another client can be connected at the same time.
 * Time from `8010` to the flame being completely out. The measurement was lost; the status flag clears quickly but the physical burner takes longer.
 * Meaning of flag `0x0200` and the field around positions 28-31 of the status frame.
 * What the second burner physically does. No visible effect was seen on the tested unit, so the switch is disabled by default.
@@ -283,6 +282,7 @@ Live tests against the physical fireplace, always with a person present.
 | 2026-10-08 | Second burner on/off | No visible change on this unit. |
 | 2026-10-08 | Flame response time | About 5-10 s after a level command. |
 | 2026-10-08 | Integration installed in Home Assistant | Entities load and report `off`; flame preset and level are unavailable while the fireplace is off. |
+| 2026-10-08 | Planika app and Home Assistant connected at the same time | Works. A change in one is reflected in the other. |
 | 2026-10-08 | Full run through the Home Assistant UI | Ignite -> flame high; Low -> flame went low; Standby worked; back to High; extinguish. All as expected. |
 
-Not yet tested: simultaneous app + Home Assistant, long-term behaviour across Wi-Fi drop-outs, other models.
+Not yet tested: long-term behaviour across Wi-Fi drop-outs, other models.

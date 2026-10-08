@@ -12,7 +12,7 @@
       }
     },
     "error": {
-      "cannot_connect": "The fireplace did not answer. Check the IP address, that it is on the same network, and that the Planika app is closed."
+      "cannot_connect": "The fireplace did not answer. Check the IP address and that the fireplace is on the same network and powered on."
     },
     "abort": {
       "already_configured": "This fireplace is already configured."

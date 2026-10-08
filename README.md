@@ -51,7 +51,7 @@ Turning the switch on **lights a real flame**. Do not automate ignition unattend
 
 ## Known limits
 
-* **Close the Planika app while Home Assistant is connected.** The module may serve only one client at a time. This has not been confirmed either way.
+* The Planika app and Home Assistant can be connected at the same time; a change made in one shows up in the other.
 * The flame follows a level change after roughly 5-10 s.
 * Only one unit has been tested. Behaviour on other models is unknown. Reports are welcome in the issue tracker.
 * Meaning of a few status bits and of three app commands is still unknown (see [docs/PROTOCOL.md](docs/PROTOCOL.md#9-open-questions)).
