@@ -282,6 +282,7 @@ Live tests against the physical fireplace, always with a person present.
 | 2026-10-08 | Level `8B` then `40` then `00` | Visibly lower, then almost out, then a small waiting flame; status stays lit. |
 | 2026-10-08 | Second burner on/off | No visible change on this unit. |
 | 2026-10-08 | Flame response time | About 5-10 s after a level command. |
-| 2026-10-08 | Integration installed in Home Assistant | Entities load and report `off`; flame preset and level are unavailable while the fireplace is off. A full ignite -> lit -> presets -> extinguish run through the Home Assistant UI is still to be recorded here. |
+| 2026-10-08 | Integration installed in Home Assistant | Entities load and report `off`; flame preset and level are unavailable while the fireplace is off. |
+| 2026-10-08 | Full run through the Home Assistant UI | Ignite -> flame high; Low -> flame went low; Standby worked; back to High; extinguish. All as expected. |
 
 Not yet tested: simultaneous app + Home Assistant, long-term behaviour across Wi-Fi drop-outs, other models.
