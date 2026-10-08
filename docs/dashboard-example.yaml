@@ -1,0 +1,123 @@
+# Planika fireplace card. Needs custom:button-card (HACS, frontend).
+# Entity ids follow the name given to the fireplace (default "Planika Fireplace").
+# Paste into a manual card, or as one card in a dashboard view.
+type: vertical-stack
+cards:
+- type: custom:button-card
+  entity: sensor.planika_fireplace_status
+  show_state: false
+  show_name: true
+  show_label: true
+  show_icon: true
+  aspect_ratio: 2.2/1
+  tap_action:
+    action: perform-action
+    perform_action: switch.toggle
+    target:
+      entity_id: switch.planika_fireplace
+    confirmation:
+      text: Switch the fireplace now? Igniting lights a real flame - make sure you are at the fireplace.
+  name: '[[[ return entity.state === "off" ? "Fireplace off - tap to ignite" : (entity.state === "igniting" ? "Igniting..." : "Fireplace lit"); ]]]'
+  label: '[[[ return entity.state === "off" ? "Tap to ignite (asks for confirmation)" : (entity.state === "igniting" ? "Waiting for the fireplace to confirm (about 20 s)" : "Confirmed lit - tap to extinguish");
+    ]]]'
+  icon: '[[[ return entity.state === "off" ? "mdi:fireplace-off" : "mdi:fireplace"; ]]]'
+  state:
+  - value: 'off'
+    color: var(--secondary-text-color)
+  - value: igniting
+    color: rgb(255,152,0)
+    styles:
+      card:
+      - background: rgba(255,152,0,0.18)
+      - border: 2px solid rgb(255,152,0)
+      - animation: pk-pulse 1.1s ease-in-out infinite
+      icon:
+      - animation: pk-pulse 1.1s ease-in-out infinite
+  - value: lit
+    color: rgb(244,67,54)
+    styles:
+      card:
+      - background: rgba(244,67,54,0.16)
+      - border: 2px solid rgb(244,67,54)
+  extra_styles: '@keyframes pk-pulse { 0% { opacity: 1; } 50% { opacity: 0.35; } 100% { opacity: 1; } }'
+  styles:
+    name:
+    - font-weight: bold
+    - font-size: 1.2em
+    label:
+    - font-size: 0.85em
+    - opacity: '0.8'
+- type: horizontal-stack
+  cards:
+  - type: custom:button-card
+    entity: select.planika_fireplace_flame_preset
+    name: Standby
+    icon: mdi:fire-off
+    show_state: false
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.planika_fireplace_flame_preset
+      data:
+        option: standby
+    styles:
+      card:
+      - background: '[[[ return entity.state === "standby" ? "rgba(255,152,0,0.30)" : "var(--card-background-color)"; ]]]'
+      - border: '[[[ return entity.state === "standby" ? "2px solid rgb(255,152,0)" : "2px solid transparent"; ]]]'
+      - opacity: '[[[ return (entity.state === "unavailable" || entity.state === "unknown") ? "0.35" : "1"; ]]]'
+      - pointer-events: '[[[ return (entity.state === "unavailable" || entity.state === "unknown") ? "none" : "auto"; ]]]'
+      icon:
+      - color: '[[[ return entity.state === "standby" ? "rgb(255,152,0)" : "var(--secondary-text-color)"; ]]]'
+      name:
+      - font-weight: '[[[ return entity.state === "standby" ? "bold" : "normal"; ]]]'
+  - type: custom:button-card
+    entity: select.planika_fireplace_flame_preset
+    name: Low
+    icon: mdi:fire
+    show_state: false
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.planika_fireplace_flame_preset
+      data:
+        option: low
+    styles:
+      card:
+      - background: '[[[ return entity.state === "low" ? "rgba(255,152,0,0.30)" : "var(--card-background-color)"; ]]]'
+      - border: '[[[ return entity.state === "low" ? "2px solid rgb(255,152,0)" : "2px solid transparent"; ]]]'
+      - opacity: '[[[ return (entity.state === "unavailable" || entity.state === "unknown") ? "0.35" : "1"; ]]]'
+      - pointer-events: '[[[ return (entity.state === "unavailable" || entity.state === "unknown") ? "none" : "auto"; ]]]'
+      icon:
+      - color: '[[[ return entity.state === "low" ? "rgb(255,152,0)" : "var(--secondary-text-color)"; ]]]'
+      name:
+      - font-weight: '[[[ return entity.state === "low" ? "bold" : "normal"; ]]]'
+  - type: custom:button-card
+    entity: select.planika_fireplace_flame_preset
+    name: High
+    icon: mdi:fire-alert
+    show_state: false
+    tap_action:
+      action: perform-action
+      perform_action: select.select_option
+      target:
+        entity_id: select.planika_fireplace_flame_preset
+      data:
+        option: high
+    styles:
+      card:
+      - background: '[[[ return entity.state === "high" ? "rgba(255,152,0,0.30)" : "var(--card-background-color)"; ]]]'
+      - border: '[[[ return entity.state === "high" ? "2px solid rgb(255,152,0)" : "2px solid transparent"; ]]]'
+      - opacity: '[[[ return (entity.state === "unavailable" || entity.state === "unknown") ? "0.35" : "1"; ]]]'
+      - pointer-events: '[[[ return (entity.state === "unavailable" || entity.state === "unknown") ? "none" : "auto"; ]]]'
+      icon:
+      - color: '[[[ return entity.state === "high" ? "rgb(255,152,0)" : "var(--secondary-text-color)"; ]]]'
+      name:
+      - font-weight: '[[[ return entity.state === "high" ? "bold" : "normal"; ]]]'
+- type: tile
+  entity: number.planika_fireplace_flame_level
+  name: Flame level
+  features:
+  - type: numeric-input
+    style: slider

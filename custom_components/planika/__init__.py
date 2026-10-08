@@ -1,55 +1,46 @@
-"""Planika Fireplace integration for Home Assistant."""
+"""The Planika Fireplace integration."""
 
 from __future__ import annotations
 
-import logging
-from datetime import timedelta
-
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PORT, Platform
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .client import PlanikaClient, PlanikaCommunicationError
-from .const import DOMAIN, SCAN_INTERVAL_SECONDS
+from .client import PlanikaClient
+from .const import CONF_HOST, CONF_PORT, DEFAULT_PORT
 
-_LOGGER = logging.getLogger(__name__)
+PLATFORMS: list[Platform] = [
+    Platform.SENSOR,
+    Platform.SWITCH,
+    Platform.SELECT,
+    Platform.NUMBER,
+]
 
-PLATFORMS = [Platform.LIGHT]
+type PlanikaConfigEntry = ConfigEntry[PlanikaClient]
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Planika from a config entry."""
-    client = PlanikaClient(entry.data[CONF_HOST], entry.data[CONF_PORT])
+async def async_setup_entry(hass: HomeAssistant, entry: PlanikaConfigEntry) -> bool:
+    """Open the connection and set up the platforms.
 
-    async def _async_update_data():
-        try:
-            return await client.get_state()
-        except PlanikaCommunicationError as exc:
-            raise UpdateFailed(f"Error communicating with Planika: {exc}") from exc
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name=DOMAIN,
-        update_method=_async_update_data,
-        update_interval=timedelta(seconds=SCAN_INTERVAL_SECONDS),
+    The connection is made in the background, so entities start out
+    unavailable and become available with the first status frame.
+    """
+    client = PlanikaClient(
+        entry.data[CONF_HOST], entry.data.get(CONF_PORT, DEFAULT_PORT)
     )
-
-    await coordinator.async_config_entry_first_refresh()
-
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
-        "coordinator": coordinator,
-        "client": client,
-    }
+    await client.async_start()
+    entry.runtime_data = client
+    entry.async_on_unload(client.async_stop)
+    entry.async_on_unload(entry.add_update_listener(_async_reload_on_update))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
-    return unload_ok
+async def async_unload_entry(hass: HomeAssistant, entry: PlanikaConfigEntry) -> bool:
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def _async_reload_on_update(hass: HomeAssistant, entry: PlanikaConfigEntry) -> None:
+    """Reload when host/port are changed in the options."""
+    await hass.config_entries.async_reload(entry.entry_id)

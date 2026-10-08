@@ -1,52 +1,68 @@
-# Planika Fireplace — Home Assistant Custom Integration
+# Planika Fireplace for Home Assistant
 
-Control your [Planika](https://planikafires.com/) bioethanol fireplace from Home Assistant.
+Local control of a [Planika](https://planikafires.com/) fireplace that has the Wi-Fi module used by the **Planika Gas Control** app. No cloud, no account: Home Assistant talks directly to the module over TCP.
 
-Ported from the [homebridge-planika](https://github.com/bkovacic/homebridge-planika) plugin by bkovacic.
+> Unofficial. Not affiliated with or endorsed by Planika. The protocol was reverse-engineered from the official app's network traffic and verified on one real unit. See [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
-## Features
+## Entities
 
-- **Turn on / off** the fireplace
-- **Flame level control** (1–5) via the brightness slider
-- Polled state updates every 30 seconds
-- Config flow: set up entirely through the HA UI (Settings → Integrations)
+| Entity | Type | What it does |
+|---|---|---|
+| **Fireplace** | switch | Ignite / extinguish. Reads *on* from the moment ignition starts. |
+| **Status** | sensor (enum) | `off`, `igniting`, `lit`. Reported by the fireplace itself, not guessed. Ignition takes about 20 s before `lit` is confirmed. |
+| **Flame preset** | select | `standby`, `low`, `high`. *Standby* is a small waiting flame, not off. |
+| **Flame level** | number | Exact flame level, 0-100 %. |
+| **Second burner** | switch | Disabled by default (no visible effect was observed on the development unit). Enable it in the entity settings if your unit reacts to it. |
+
+Flame preset, flame level and second burner are **unavailable unless the fireplace is confirmed `lit`**. They are greyed out while the fireplace is off or still igniting, so a command can never be sent into a fireplace that is not burning.
 
 ## Installation
 
+### HACS (custom repository)
+
+1. HACS -> three-dot menu -> *Custom repositories* -> add `https://github.com/decorteq/ha-planika-fireplace`, category *Integration*.
+2. Install **Planika Fireplace** and restart Home Assistant.
+
 ### Manual
 
-1. Copy the `custom_components/planika` folder into your HA `config/custom_components/` directory.
-2. Restart Home Assistant.
+Copy `custom_components/planika` into your Home Assistant `config/custom_components/` directory and restart.
 
-## Configuration
+## Setup
 
-1. Go to **Settings → Devices & Services → Add Integration**.
-2. Search for **Planika Fireplace**.
-3. Enter the local IP address of your fireplace (e.g. `192.168.1.100`).
-4. Optionally change the port (default `3000`) and the display name.
+1. Give the fireplace a **fixed IP address** (DHCP reservation in your router). The module can also drop off Wi-Fi for minutes at a time; the integration reconnects on its own.
+2. *Settings -> Devices & services -> Add integration -> Planika Fireplace*.
+3. Enter the IP address. The port is **2000**.
 
-The fireplace will appear as a **Light** entity with brightness control.
+If the address changes later, use the integration's **Configure** button. You do not need to delete and re-add it.
 
-## How it works
+## Dashboard
 
-The fireplace exposes a TCP socket on port 3000.
-The integration sends plain-text commands and reads JSON responses:
+[docs/dashboard-example.yaml](docs/dashboard-example.yaml) contains a ready-made view (needs the [button-card](https://github.com/custom-cards/button-card) HACS frontend card):
 
-| Command    | Effect                                        |
-|------------|-----------------------------------------------|
-| `STATUS`   | Returns `{"status":"on/off","flame":1-5}`     |
-| `ON`       | Ignites the fireplace                         |
-| `OFF`      | Extinguishes the fireplace                    |
-| `FLAME=N`  | Sets flame level (1 = low, 5 = high)          |
+* a main button that **pulses orange while igniting** and turns solid red once the fireplace confirms `lit`;
+* Standby / Low / High as a three-segment control with the active mode highlighted;
+* the flame level slider.
 
-Brightness in Home Assistant (0–255) is linearly mapped to flame levels 1–5.
+Entity IDs follow the name you gave the fireplace (default `Planika Fireplace` -> `switch.planika_fireplace`, `sensor.planika_fireplace_status`, `select.planika_fireplace_flame_preset`, `number.planika_fireplace_flame_level`).
 
-## Troubleshooting
+## Safety
 
-- Make sure your fireplace and HA instance are on the same network.
-- Test connectivity: `nc -zv <ip> 3000`
-- Check HA logs (`Settings → System → Logs`) and filter for `planika`.
+Turning the switch on **lights a real flame**. Do not automate ignition unattended unless you have considered the consequences. The integration only sends the same commands the official app sends.
+
+## Known limits
+
+* **Close the Planika app while Home Assistant is connected.** The module may serve only one client at a time. This has not been confirmed either way.
+* The flame follows a level change after roughly 5-10 s.
+* Only one unit has been tested. Behaviour on other models is unknown. Reports are welcome in the issue tracker.
+* Meaning of a few status bits and of three app commands is still unknown (see [docs/PROTOCOL.md](docs/PROTOCOL.md#9-open-questions)).
+
+## Documentation
+
+* [docs/PROTOCOL.md](docs/PROTOCOL.md) - how the protocol works and how it was worked out (frame format, commands, status decoding, behaviour, test log).
+* [docs/dashboard-example.yaml](docs/dashboard-example.yaml) - dashboard view.
+* [CHANGELOG.md](CHANGELOG.md)
+* `dev/` - offline tests that run the client (and, with Home Assistant installed, the entities) against a simulated fireplace: `python3 dev/test_client.py`.
 
 ## License
 
-Apache 2.0 — same as the original homebridge-planika plugin.
+Apache 2.0, see [LICENSE](LICENSE).
